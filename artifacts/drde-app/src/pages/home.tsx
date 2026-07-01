@@ -110,32 +110,62 @@ export default function Home() {
           {(appState === "IDLE" || appState === "CONFIGURING") && (
             <motion.div 
               key="idle"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
               className="flex flex-col items-center text-center max-w-3xl"
             >
-              <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-secondary text-primary shadow-xl">
-                <Shield className="w-10 h-10" />
-              </div>
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-secondary mb-4">
-                Emerging Risk
-                <br />
-                Deep Evaluation
-              </h1>
-              <p className="text-xl md:text-2xl text-muted-foreground font-light mb-12 tracking-wide">
-                DRDE Intelligence Briefing Tool
-              </p>
-              
-              <Button 
-                size="lg" 
-                className="text-lg px-8 py-6 h-auto rounded-xl shadow-lg hover:shadow-xl transition-all"
-                onClick={() => setAppState("CONFIGURING")}
-                data-testid="button-configure"
+              {/* U-M Enterprise Strategic Risk Management logo */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="mb-12"
               >
-                Configure Briefing <ChevronRight className="ml-2 w-5 h-5" />
-              </Button>
+                <img
+                  src="/um-esrm-logo.png"
+                  alt="University of Michigan Enterprise Strategic Risk Management"
+                  className="h-14 md:h-16 w-auto object-contain"
+                  draggable={false}
+                />
+              </motion.div>
+
+              {/* Divider */}
+              <div className="w-16 h-px bg-border mb-10" />
+
+              {/* Tool name */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.25 }}
+                className="mb-10"
+              >
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-semibold mb-3">
+                  Risk Intelligence Platform
+                </p>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-secondary leading-tight">
+                  Emerging Risk Deep Evaluation
+                </h1>
+                <p className="text-base text-muted-foreground mt-2 font-light tracking-widest uppercase">
+                  DRDE
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <Button 
+                  size="lg" 
+                  className="text-base px-10 py-5 h-auto rounded-lg shadow-md hover:shadow-lg transition-all"
+                  onClick={() => setAppState("CONFIGURING")}
+                  data-testid="button-configure"
+                >
+                  Configure <ChevronRight className="ml-1.5 w-4 h-4" />
+                </Button>
+              </motion.div>
             </motion.div>
           )}
 
