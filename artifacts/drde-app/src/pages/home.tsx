@@ -94,7 +94,7 @@ export default function Home() {
     const element = document.createElement("a");
     const file = new Blob([reportData.reportContent], {type: 'text/plain'});
     element.href = URL.createObjectURL(file);
-    element.download = `DRDE_Report_${reportData.topic}_${new Date().toISOString().split('T')[0]}.txt`;
+    element.download = `ERDE_Report_${reportData.topic}_${new Date().toISOString().split('T')[0]}.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -148,7 +148,7 @@ export default function Home() {
                   Emerging Risk Deep Evaluation
                 </h1>
                 <p className="text-base text-muted-foreground mt-2 font-light tracking-widest uppercase">
-                  DRDE
+                  ERDE
                 </p>
               </motion.div>
 
@@ -207,7 +207,7 @@ export default function Home() {
                     </div>
                     <div className="flex justify-between">
                       <span>Job ID:</span>
-                      <span className="text-secondary font-medium">{jobId ? `DRDE-${jobId.toString().padStart(5, '0')}` : "Pending"}</span>
+                      <span className="text-secondary font-medium">{jobId ? `ERDE-${jobId.toString().padStart(5, '0')}` : "Pending"}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -438,7 +438,7 @@ export default function Home() {
           <div className="bg-secondary text-primary-foreground px-6 py-4 flex items-center justify-between shadow-sm z-10 relative">
             <div>
               <h2 className="text-xl font-bold text-white tracking-tight">Intelligence Briefing: {jobStatus?.topic}</h2>
-              <p className="text-white/70 text-sm font-mono mt-1">ID: DRDE-{jobId?.toString().padStart(5, '0')} | {new Date().toLocaleDateString()}</p>
+              <p className="text-white/70 text-sm font-mono mt-1">ID: ERDE-{jobId?.toString().padStart(5, '0')} | {new Date().toLocaleDateString()}</p>
             </div>
             <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white" onClick={handleDownload}>
               <Download className="w-4 h-4 mr-2" /> Export
