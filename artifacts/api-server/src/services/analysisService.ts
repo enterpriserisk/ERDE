@@ -135,7 +135,9 @@ Key Takeaways:
 - Most immediate operational risk: [...]
 - Most significant regulatory concern: [...]
 - Most significant reputational concern: [...]
-- Recommended areas leadership should continue monitoring: [...]`;
+- Recommended areas leadership should continue monitoring: [...]
+
+CRITICAL FORMATTING RULE: Do NOT include any closing signature, sign-off, name, title, role, affiliation, or "Prepared by" line of any kind. End the report immediately after the Executive Takeaways. The output is from an automated AI system, not a person.`;
 }
 
 export async function runAnalysis(jobId: number): Promise<void> {
