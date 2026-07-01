@@ -1,6 +1,5 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
   description: API specification
@@ -10,6 +9,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: analysis
+    description: Risk analysis operations
 paths:
   /healthz:
     get:
@@ -24,6 +25,122 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /analysis/start:
+    post:
+      operationId: startAnalysis
+      tags: [analysis]
+      summary: Start a risk analysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisInput"
+      responses:
+        "201":
+          description: Analysis job created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisJob"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /analysis/{id}/status:
+    get:
+      operationId: getAnalysisStatus
+      tags: [analysis]
+      summary: Get analysis job status and progress
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analysis status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisJob"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /analysis/{id}/report:
+    get:
+      operationId: getAnalysisReport
+      tags: [analysis]
+      summary: Get completed analysis report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analysis report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisReport"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /analysis/{id}/retry-email:
+    post:
+      operationId: retryEmail
+      tags: [analysis]
+      summary: Retry sending email for a completed analysis
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Email retry result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailResult"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /analysis:
+    get:
+      operationId: listAnalyses
+      tags: [analysis]
+      summary: List past analyses
+      responses:
+        "200":
+          description: List of analyses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnalysisJob"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +151,108 @@ components:
       required:
         - status
 
+    AnalysisInput:
+      type: object
+      required:
+        - topic
+        - recipientEmail
+      properties:
+        topic:
+          type: string
+          description: Risk topic category
+        recipientEmail:
+          type: string
+          format: email
+          description: Email address to send the report to
+
+    AnalysisJob:
+      type: object
+      required:
+        - id
+        - topic
+        - recipientEmail
+        - status
+        - stage
+        - progress
+        - createdAt
+      properties:
+        id:
+          type: integer
+        topic:
+          type: string
+        recipientEmail:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, complete, failed]
+        stage:
+          type: string
+          description: Current processing stage label
+        progress:
+          type: integer
+          description: Progress percentage 0-100
+        emailSent:
+          type: ["boolean", "null"]
+        emailError:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: ["string", "null"]
+          format: date-time
+
+    AnalysisReport:
+      type: object
+      required:
+        - id
+        - topic
+        - recipientEmail
+        - status
+        - stage
+        - progress
+        - createdAt
+      properties:
+        id:
+          type: integer
+        topic:
+          type: string
+        recipientEmail:
+          type: string
+        status:
+          type: string
+        stage:
+          type: string
+        progress:
+          type: integer
+        reportContent:
+          type: ["string", "null"]
+          description: Full AI-generated report text
+        emailSent:
+          type: ["boolean", "null"]
+        emailError:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: ["string", "null"]
+          format: date-time
+
+    EmailResult:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    ApiError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
