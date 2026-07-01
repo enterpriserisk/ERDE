@@ -213,12 +213,16 @@ export async function sendReport(
   recipientEmail: string,
   reportContent: string,
 ): Promise<void> {
-  const fromAddress = process.env.RESEND_FROM_EMAIL;
-  if (!fromAddress) {
-    throw new Error(
-      "RESEND_FROM_EMAIL is not set. Please set this environment variable to a verified sender address on your Resend account (e.g. noreply@yourdomain.com).",
-    );
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  if (!gmailUser || !gmailPass) {
+    throw new Error("GMAIL_USER and GMAIL_APP_PASSWORD must be set.");
   }
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: gmailUser, pass: gmailPass },
+  });
 
   const now = new Date();
   const timestamp = now.toLocaleString("en-US", {
@@ -293,20 +297,12 @@ export async function sendReport(
 </body>
 </html>`;
 
-  const response = await connectors.proxy("resend", "/emails", {
-    method: "POST",
-    body: JSON.stringify({
-      from: fromAddress,
-      to: [recipientEmail],
-      subject,
-      html: htmlBody,
-    }),
+  await transporter.sendMail({
+    from: `"DRDE Risk Intelligence" <${gmailUser}>`,
+    to: recipientEmail,
+    subject,
+    html: htmlBody,
   });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Resend API error ${response.status}: ${text}`);
-  }
 
   logger.info({ jobId, recipientEmail }, "Email sent successfully");
 }
