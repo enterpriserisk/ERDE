@@ -3,6 +3,7 @@ import { analysesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { ai } from "@workspace/integrations-gemini-ai";
 import nodemailer from "nodemailer";
+import { marked } from "marked";
 import { logger } from "../lib/logger";
 
 const STAGES = [
@@ -237,7 +238,7 @@ export async function sendReport(
 
   const subject = `Risk Intelligence Brief — ${topic} — ${now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`;
 
-  const safeContent = reportContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const renderedContent = await marked.parse(reportContent, { gfm: true, breaks: false });
 
   const htmlBody = `<!DOCTYPE html>
 <html lang="en">
@@ -246,20 +247,46 @@ export async function sendReport(
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, Helvetica, sans-serif; background: #f5f5f5; color: #222; }
+    body { font-family: Arial, Helvetica, sans-serif; background: #f0f0f0; color: #222; }
     .wrapper { max-width: 780px; margin: 0 auto; background: #ffffff; }
-    .header { background: #00274C; padding: 24px 32px; border-bottom: 4px solid #FFCB05; }
-    .header-label { color: #FFCB05; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; margin-bottom: 6px; }
-    .header-title { color: #ffffff; font-size: 20px; font-weight: 700; letter-spacing: 0.01em; }
-    .header-sub { color: rgba(255,255,255,0.65); font-size: 12px; margin-top: 4px; }
-    .meta { background: #f8f8f8; padding: 14px 32px; border-bottom: 1px solid #e5e5e5; display: flex; gap: 32px; flex-wrap: wrap; }
-    .meta-item { font-size: 11px; }
-    .meta-label { color: #888; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
-    .meta-value { color: #333; margin-top: 2px; font-weight: 500; }
-    .body { padding: 32px; }
-    .content { white-space: pre-wrap; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.75; color: #2a2a2a; }
-    .footer { border-top: 1px solid #e5e5e5; padding: 16px 32px; background: #fafafa; }
-    .footer-text { font-size: 11px; color: #aaa; }
+
+    /* Header */
+    .header { background: #00274C; padding: 24px 36px; border-bottom: 4px solid #FFCB05; }
+    .header-label { color: #FFCB05; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+    .header-title { color: #ffffff; font-size: 22px; font-weight: 700; }
+    .header-sub { color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 4px; }
+
+    /* Meta strip */
+    .meta { background: #f7f7f7; padding: 12px 36px; border-bottom: 1px solid #e0e0e0; }
+    .meta table { width: 100%; border-collapse: collapse; }
+    .meta td { font-size: 11px; padding: 2px 16px 2px 0; vertical-align: top; }
+    .meta .lbl { color: #999; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; display: block; }
+    .meta .val { color: #333; font-weight: 500; }
+
+    /* Body */
+    .body { padding: 36px; }
+
+    /* Typography */
+    .body h1 { font-size: 20px; font-weight: 700; color: #00274C; margin: 32px 0 10px; padding-bottom: 6px; border-bottom: 2px solid #FFCB05; }
+    .body h2 { font-size: 17px; font-weight: 700; color: #00274C; margin: 28px 0 8px; }
+    .body h3 { font-size: 14px; font-weight: 700; color: #00274C; margin: 20px 0 6px; }
+    .body p { font-size: 14px; line-height: 1.75; color: #333; margin: 0 0 12px; }
+    .body ul, .body ol { margin: 8px 0 14px 20px; }
+    .body li { font-size: 14px; line-height: 1.7; color: #333; margin-bottom: 4px; }
+    .body strong { color: #00274C; font-weight: 700; }
+    .body em { font-style: italic; color: #555; }
+    .body blockquote { border-left: 3px solid #FFCB05; margin: 12px 0; padding: 8px 16px; background: #fffbea; color: #555; font-size: 13px; }
+    .body hr { border: none; border-top: 1px solid #e5e5e5; margin: 24px 0; }
+
+    /* Tables */
+    .body table { width: 100%; border-collapse: collapse; margin: 16px 0 20px; font-size: 13px; }
+    .body th { background: #00274C; color: #ffffff; text-align: left; padding: 9px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .body td { padding: 9px 12px; border-bottom: 1px solid #e8e8e8; color: #333; vertical-align: top; }
+    .body tr:nth-child(even) td { background: #f9f9f9; }
+
+    /* Footer */
+    .footer { border-top: 1px solid #e5e5e5; padding: 16px 36px; background: #f7f7f7; }
+    .footer-text { font-size: 11px; color: #aaa; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -270,28 +297,16 @@ export async function sendReport(
       <div class="header-sub">Emerging Risk Deep Evaluation (DRDE)</div>
     </div>
     <div class="meta">
-      <div class="meta-item">
-        <div class="meta-label">Generated</div>
-        <div class="meta-value">${timestamp}</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">Topic</div>
-        <div class="meta-value">${topic}</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">Job ID</div>
-        <div class="meta-value">DRDE-${jobId.toString().padStart(5, "0")}</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">Source</div>
-        <div class="meta-value">AI-Generated — Gemini</div>
-      </div>
+      <table><tr>
+        <td><span class="lbl">Generated</span><span class="val">${timestamp}</span></td>
+        <td><span class="lbl">Topic</span><span class="val">${topic}</span></td>
+        <td><span class="lbl">Job ID</span><span class="val">DRDE-${jobId.toString().padStart(5, "0")}</span></td>
+        <td><span class="lbl">Source</span><span class="val">AI-Generated — Gemini</span></td>
+      </tr></table>
     </div>
-    <div class="body">
-      <div class="content">${safeContent}</div>
-    </div>
+    <div class="body">${renderedContent}</div>
     <div class="footer">
-      <div class="footer-text">This report was automatically generated by the DRDE AI intelligence system. It does not represent the views of any individual. For questions about this system, contact your ESRM team.</div>
+      <div class="footer-text">Automatically generated by the DRDE AI intelligence system. Does not represent the views of any individual. Contact your ESRM team with questions.</div>
     </div>
   </div>
 </body>
