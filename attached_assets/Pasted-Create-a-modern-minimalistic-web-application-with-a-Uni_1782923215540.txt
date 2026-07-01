@@ -1,0 +1,282 @@
+Create a modern, minimalistic web application with a University of Michigan-inspired design (Michigan Maize & Blue color palette, clean typography, generous spacing, subtle shadows, and rounded corners). The interface should feel professional, intuitive, and polished without unnecessary visual clutter.
+Application Title
+Emerging Risk Deep Evaluation (DRDE)
+
+Home Screen
+The homepage should be extremely simple.
+Display the title Emerging Risk Deep Evaluation (DRDE) prominently at the top.
+Below the title, place a single large centered button labeled:
+Configure
+The page should have smooth fade/slide animations when loading.
+
+Configuration Modal
+Clicking Configure opens a centered modal with a clean modern appearance.
+The modal contains:
+Risk Topic
+Allow the user to choose one of the following risk categories:
+Research
+Funding
+Finance
+People
+Athletics
+Security
+Safety
+Digital
+Regulatory
+Healthcare
+Reputation
+Use either:
+modern selectable cards, or
+a polished segmented list with icons.
+The selected category should be visually highlighted.
+
+Recipient Email
+Provide an email input field where the user enters the destination email address.
+Validate the email before allowing submission.
+
+Begin Analysis
+At the bottom of the modal include a primary button labeled:
+Deep Dive
+
+Backend Workflow
+When Deep Dive is clicked:
+Generate a dynamic prompt by inserting the selected risk topic into a predefined prompt template.
+The template is as follows:
+
+Higher Education Risk Intelligence Prompt
+You are a senior Risk Intelligence Analyst responsible for monitoring emerging risks affecting higher education institutions, with particular emphasis on the University of Michigan (all campuses).
+Your objective is to identify and summarize the seven (7) most significant and emerging risks related to the topic:
+TOPIC: [Insert Topic]
+Examples include:
+AI
+Data Privacy
+Research
+Federal Funding
+Mental Health
+Title IX
+Athletics/NIL
+Cybersecurity
+ESG
+Residential Life
+Compliance
+Third Parties
+Cryptocurrency
+etc.
+
+Scope
+Search for information published within the last 30 days whenever possible. If insufficient information exists, expand to the previous 90 days while prioritizing the newest developments.
+Use authoritative, credible sources including:
+Federal agencies
+State governments
+University announcements
+Major higher education organizations
+National news organizations
+Regulatory agencies
+Industry reports
+Research institutions
+Examples include:
+Department of Education
+NIH
+NSF
+HHS
+FBI
+CISA
+NIST
+OCR
+NCAA
+AAU
+APLU
+EDUCAUSE
+NACUBO
+Chronicle of Higher Education
+Inside Higher Ed
+Higher Ed Dive
+Reuters
+AP
+Bloomberg
+University of Michigan News
+Michigan Medicine
+Michigan Daily (for campus-specific developments)
+Avoid opinion pieces unless they provide unique information.
+
+Selection Criteria
+Rank risks according to:
+Severity
+Likelihood
+Potential impact on higher education
+Relevance to research universities
+Relevance to the University of Michigan
+Novelty or rapidly changing developments
+Frequency of reporting across multiple reputable sources
+Prioritize risks that may require executive awareness.
+
+Required Analysis
+For each of the Top 7 Risks, provide:
+Risk Title
+A concise executive-level title.
+
+Executive Summary (2–3 sentences)
+Explain:
+What happened
+Why it matters
+Why leadership should care
+
+Why This Matters to the University of Michigan
+Provide an interpretation specific to Michigan.
+Discuss possible impacts such as:
+research
+finances
+compliance
+operations
+reputation
+healthcare
+students
+faculty
+athletics
+cybersecurity
+government funding
+international programs
+
+Potential Impacts
+Provide 3–6 concise bullet points describing realistic consequences if the issue escalates.
+
+Trend
+Choose one:
+Emerging
+Escalating
+Stable
+Declining
+Ongoing
+
+Risk Level
+Choose one:
+Critical
+High
+Moderate
+Low
+
+Confidence
+Choose one:
+High
+Medium
+Low
+based upon the quality and consistency of reporting.
+
+Key Sources
+Provide 2–5 credible sources.
+Include:
+Organization
+Article title
+Publication date
+URL
+
+Ranking
+At the beginning of the report include a table:
+Rank
+Risk
+Trend
+Risk Level
+U-M Relevance
+
+Rank from highest priority to lowest.
+
+Writing Style
+Write for:
+University President
+Regents
+Provost
+Executive Officers
+Chief Risk Officer
+Board members
+The report should be:
+concise
+executive-level
+interpretive
+actionable
+non-technical
+Avoid simply summarizing articles.
+Instead explain:
+"What does this mean?"
+and
+"Why should leadership care?"
+
+Email Format
+Produce the final output as a professional intelligence briefing email using the following structure:
+
+Subject:
+Weekly Risk Intelligence Brief — [Topic] — [Current Date]
+
+Good morning,
+Below is this week's executive risk intelligence summary regarding [Topic]. These developments represent the most significant emerging issues with potential implications for higher education institutions and the University of Michigan.
+Executive Summary
+Provide a brief 2–4 paragraph overview of the overall risk landscape.
+
+Top Risks
+(List the seven risks.)
+
+Executive Takeaways
+End with:
+Key Takeaways
+Largest emerging concern
+Most immediate operational risk
+Most significant regulatory concern
+Most significant reputational concern
+Recommended areas leadership should continue monitoring
+
+
+
+
+Send the prompt to Google Gemini.
+Wait for Gemini to complete its analysis.
+Email the generated report to the recipient entered in the configuration modal.
+Save the complete AI response locally (database or file storage) before attempting to send the email so no results are lost if email delivery fails.
+If email fails:
+notify the user,
+keep the report available,
+allow retrying the email without rerunning the AI analysis.
+
+Progress Screen
+After clicking Deep Dive, replace the modal with a dedicated progress interface.
+Display:
+an animated progress bar,
+current processing stage,
+estimated time remaining,
+subtle loading animation.
+Example stages:
+Preparing request...
+Building prompt...
+Contacting Gemini...
+Generating report...
+Formatting response...
+Saving report...
+Sending email...
+Complete
+The progress should feel responsive and realistic rather than jumping instantly to 100%.
+
+Completion Screen
+Once processing finishes:
+Display a success card showing:
+✅ Analysis Complete
+Email sent successfully (or failed)
+Report saved successfully
+Provide buttons for:
+View Report
+Download Report
+Retry Email (if necessary)
+Start New Evaluation
+
+UI/UX Requirements
+The application should prioritize simplicity and polish.
+Minimalistic University of Michigan-inspired theme
+Michigan Maize (#FFCB05) and Blue (#00274C) accents
+Clean sans-serif typography
+Rounded corners
+Soft shadows
+Responsive layout
+Smooth fade and slide animations
+Elegant hover effects
+Accessible color contrast
+Mobile-friendly design
+Light theme by default
+Animations should be subtle, fluid, and professional—never distracting.
+

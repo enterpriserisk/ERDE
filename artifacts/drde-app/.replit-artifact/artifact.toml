@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Emerging Risk Deep Evaluation (DRDE)"
+version = "1.0.0"
+id = "artifacts/drde-app"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18310
+
+[services.development]
+run = "pnpm --filter @workspace/drde-app run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/drde-app", "run", "build" ]
+publicDir = "artifacts/drde-app/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18310"
+BASE_PATH = "/"
