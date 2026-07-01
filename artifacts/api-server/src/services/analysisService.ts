@@ -2,10 +2,8 @@ import { db } from "@workspace/db";
 import { analysesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { ai } from "@workspace/integrations-gemini-ai";
-import { ReplitConnectors } from "@replit/connectors-sdk";
+import nodemailer from "nodemailer";
 import { logger } from "../lib/logger";
-
-const connectors = new ReplitConnectors();
 
 const STAGES = [
   { stage: "Preparing request...", progress: 5 },
