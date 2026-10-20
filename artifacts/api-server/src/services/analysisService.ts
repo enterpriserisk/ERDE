@@ -6,6 +6,16 @@ import nodemailer from "nodemailer";
 import { marked } from "marked";
 import { logger } from "../lib/logger";
 
+// gemini-3.8-flash is on the Gemini API free tier; set GEMINI_MODEL to use another model.
+const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-3.8-flash";
+
+export const RECIPIENT_DOMAIN_ERROR = "Reports can only be sent to @umich.edu addresses";
+
+// Reports may only be emailed to University of Michigan addresses.
+export function isAllowedRecipient(email: string): boolean {
+  return email.trim().toLowerCase().endsWith("@umich.edu");
+}
+
 const STAGES = [
   { stage: "Preparing request...", progress: 5 },
   { stage: "Building prompt...", progress: 12 },
@@ -158,7 +168,7 @@ export async function runAnalysis(jobId: number): Promise<void> {
     await updateJob(jobId, { stage: STAGES[3].stage, progress: STAGES[3].progress });
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       config: { maxOutputTokens: 8192 },
     });
@@ -214,6 +224,10 @@ export async function sendReport(
   recipientEmail: string,
   reportContent: string,
 ): Promise<void> {
+  if (!isAllowedRecipient(recipientEmail)) {
+    throw new Error(RECIPIENT_DOMAIN_ERROR);
+  }
+
   const gmailUser = process.env.GMAIL_USER;
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
   if (!gmailUser || !gmailPass) {

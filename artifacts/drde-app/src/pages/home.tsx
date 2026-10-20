@@ -36,7 +36,13 @@ const RISK_TOPICS = [
 
 const formSchema = z.object({
   topic: z.string().min(1, "Please select a risk topic"),
-  recipientEmail: z.string().email("Please enter a valid email address"),
+  recipientEmail: z
+    .string()
+    .email("Please enter a valid email address")
+    .refine(
+      (email) => email.trim().toLowerCase().endsWith("@umich.edu"),
+      "Reports can only be sent to @umich.edu addresses",
+    ),
 });
 
 export default function Home() {

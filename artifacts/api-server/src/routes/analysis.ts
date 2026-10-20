@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { analysesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { waitUntil } from "@vercel/functions";
 import {
   StartAnalysisBody,
   GetAnalysisStatusParams,
@@ -9,7 +10,12 @@ import {
   RetryEmailParams,
 } from "@workspace/api-zod";
 import { logger } from "../lib/logger";
-import { runAnalysis, sendReport } from "../services/analysisService";
+import {
+  isAllowedRecipient,
+  RECIPIENT_DOMAIN_ERROR,
+  runAnalysis,
+  sendReport,
+} from "../services/analysisService";
 
 const router = Router();
 
@@ -21,6 +27,11 @@ router.post("/analysis/start", async (req, res) => {
   }
 
   const { topic, recipientEmail } = parsed.data;
+
+  if (!isAllowedRecipient(recipientEmail)) {
+    res.status(400).json({ error: RECIPIENT_DOMAIN_ERROR });
+    return;
+  }
 
   const [job] = await db
     .insert(analysesTable)
@@ -35,9 +46,13 @@ router.post("/analysis/start", async (req, res) => {
 
   res.status(201).json(serializeJob(job));
 
-  runAnalysis(job.id).catch((err) => {
-    logger.error({ err, jobId: job.id }, "Analysis run failed");
-  });
+  // The report is generated after responding. On Vercel, waitUntil keeps the
+  // function alive until it finishes; elsewhere it is a no-op.
+  waitUntil(
+    runAnalysis(job.id).catch((err) => {
+      logger.error({ err, jobId: job.id }, "Analysis run failed");
+    }),
+  );
 });
 
 router.get("/analysis/:id/status", async (req, res) => {
